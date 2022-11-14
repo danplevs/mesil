@@ -1,7 +1,9 @@
-mesil
+Mesil
 ==============================
 
-My undergraduate research (temp description)
+Source code used in my undergraduate research "Investigation of cellular internalization and nanovalve endocytosis mechanisms in fluorescence-labeled rod morphology: a treatment for esophageal cancer".
+
+![Ilustration of the drug-loaded nanovalve system attacking a cancerous cell](img/graphical_abstract_dasilva2022.jpeg)
 
 Project Organization
 ------------
@@ -50,8 +52,3 @@ Project Organization
     │       └── visualize.py
     │
     └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io
-
-
---------
-
-<p><small>Project based on the <a target="_blank" href="https://drivendata.github.io/cookiecutter-data-science/">cookiecutter data science project template</a>. #cookiecutterdatascience</small></p>
