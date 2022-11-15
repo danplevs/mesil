@@ -1,51 +1,53 @@
 # GLOBALS                                                                       
 
 PROJECT_NAME = mesil
-PYTHON_INTERPRETER = python3
-CONDA_EXE = C:/Users/daniel/miniconda3/Scripts/conda.exe
-SOURCE_CODE = src
+POETRY = poetry run
 
 # COMMANDS                                                                      
 
 ## @ environment
-.PHONY: lock create_env update_env delete_env
-lock: environment.yml ## create lockfile from environment.yml
-	conda-lock -f environment.yml
-
-create_env: lock environment.yml ## create conda environment
-	conda-lock install -n $(PROJECT_NAME)
-
-update_env: environment.yml ## update packages in conda environment
-	$(CONDA_EXE) update -f environment.yml
-
-delete_env: ## delete conda environment
-	$(CONDA_EXE) env remove -n $(PROJECT_NAME)
+.PHONY: install 
+install: ## install and activate poetry venv
+	poetry install
+	poetry shell
 
 
 ## @ data
 .PHONY: data
-data: create_env ## make dataset
-	$(PYTHON_INTERPRETER) src/data/make_dataset.py data/raw data/processed
+data: install ## make dataset
+	$(POETRY) python $(PROJECT_NAME)/data/make_dataset.py data/raw data/processed
+
 
 ## @ files
 .PHONY: clean
-clean: ## delete all compiled Python files
+clean: ## delete all compiled python files
 	find . -type f -name "*.py[co]" -delete
 	find . -type d -name "__pycache__" -delete
 
 
 ## @ analysis
-.PHONY: blue isort prospector
-blue: ## lint using blue
-	blue $(SOURCE_CODE)
+.PHONY: lint_blue isort prospector
+lint_blue: ## lint using blue (format)
+	$(POETRY) blue --check $(PROJECT_NAME)
+
+lint_isort: ## sort imports
+	$(POETRY) isort --check $(PROJECT_NAME)
+
+prospector: # lint using prospector (static analysis)
+	$(POETRY) prospector $(PROJECT_NAME)
+
+analyze: lint_blue lint_isort prospector
+
+
+## @ format
+.PHONY: blue isort format
+blue: ## format using blue
+	$(POETRY) blue $(PROJECT_NAME)
 
 isort: ## sort imports
-	isort $(SOURCE_CODE)
+	$(POETRY) isort $(PROJECT_NAME)
 
-prospector: # statically analyze source code
-	prospector $(SOURCE_CODE)
-
-analyze: blue isort prospector
+format: blue isort
 
 
 # PROJECT RULES                                                                 
