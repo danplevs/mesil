@@ -4,109 +4,40 @@ PROJECT_NAME = mesil
 POETRY = poetry run
 
 # COMMANDS                                                                      
-
-## @ environment
 .PHONY: install 
-install: ## install and activate poetry venv
+install: ## Install and activate poetry env
 	poetry install
 	poetry shell
 
 
-## @ data
 .PHONY: data
-data: install ## make dataset
+data: install ## Make dataset
 	$(POETRY) python $(PROJECT_NAME)/data/make_dataset.py data/raw data/processed
 
 
-## @ files
-.PHONY: clean
-clean: ## delete all compiled python files
-	find . -type f -name "*.py[co]" -delete
-	find . -type d -name "__pycache__" -delete
-
-
-## @ analysis
 .PHONY: lint_blue isort prospector
-lint_blue: ## lint using blue (format)
+lint_blue: # Lint using blue (format)
 	$(POETRY) blue --check $(PROJECT_NAME)
 
-lint_isort: ## sort imports
+lint_isort: # Lint using isort (sort imports)
 	$(POETRY) isort --check $(PROJECT_NAME)
 
-prospector: # lint using prospector (static analysis)
+prospector: # Lint using prospector (static analysis)
 	$(POETRY) prospector $(PROJECT_NAME)
 
-analyze: lint_blue lint_isort prospector
+analyze: lint_blue lint_isort prospector ## Code analysis with blue, isort and prospector
 
 
-## @ format
 .PHONY: blue isort format
-blue: ## format using blue
+blue: # Format using blue
 	$(POETRY) blue $(PROJECT_NAME)
 
-isort: ## sort imports
+isort: # Sort imports
 	$(POETRY) isort $(PROJECT_NAME)
 
-format: blue isort
+format: blue isort ## Format using blue and isort
 
 
-# PROJECT RULES                                                                 
-
-# Self Documenting Commands                                                     
-
-.DEFAULT_GOAL := help
-
-# Inspired by <http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html>
-# sed script explained:
-# /^##/:
-# 	* save line in hold space
-# 	* purge line
-# 	* Loop:
-# 		* append newline + line to hold space
-# 		* go to next line
-# 		* if line starts with doc comment, strip comment character off and loop
-# 	* remove target prerequisites
-# 	* append hold space (+ newline) to line
-# 	* replace newline plus comments by `---`
-# 	* print line
-# Separate expressions are necessary because labels cannot be delimited by
-# semicolon; see <http://stackoverflow.com/a/11799865/1968>
 .PHONY: help
 help:
-	@echo "$$(tput bold)Available rules:$$(tput sgr0)"
-	@echo
-	@sed -n -e "/^## / { \
-		h; \
-		s/.*//; \
-		:doc" \
-		-e "H; \
-		n; \
-		s/^## //; \
-		t doc" \
-		-e "s/:.*//; \
-		G; \
-		s/\\n## /---/; \
-		s/\\n/ /g; \
-		p; \
-	}" ${MAKEFILE_LIST} \
-	| LC_ALL='C' sort --ignore-case \
-	| awk -F '---' \
-		-v ncol=$$(tput cols) \
-		-v indent=19 \
-		-v col_on="$$(tput setaf 6)" \
-		-v col_off="$$(tput sgr0)" \
-	'{ \
-		printf "%s%*s%s ", col_on, -indent, $$1, col_off; \
-		n = split($$2, words, " "); \
-		line_length = ncol - indent; \
-		for (i = 1; i <= n; i++) { \
-			line_length -= length(words[i]) + 1; \
-			if (line_length <= 0) { \
-				line_length = ncol - indent - length(words[i]) - 1; \
-				printf "\n%*s ", -indent, " "; \
-			} \
-			printf "%s ", words[i]; \
-		} \
-		printf "\n"; \
-	}' \
-	| more $(shell test $(shell uname) = Darwin && echo '--no-init --raw-control-chars')
+	@egrep -h "\s##\s" $(MAKEFILE_LIST) | sort | awk -f script.awk
