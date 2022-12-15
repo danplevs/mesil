@@ -94,3 +94,6 @@ target/
 
 # Pyenv
 .python-version
+
+# Origin
+/templates
