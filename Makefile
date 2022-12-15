@@ -7,7 +7,6 @@ POETRY = poetry run
 .PHONY: install 
 install: ## Install and activate poetry env
 	poetry install
-	poetry shell
 
 
 .PHONY: data
