@@ -100,3 +100,6 @@ target/
 
 # Powerpoint
 *.pptx
+
+# Notebooks
+/notebooks
