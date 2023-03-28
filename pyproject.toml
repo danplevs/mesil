@@ -5,25 +5,24 @@ description = "Source code used in my undergraduate research \"Investigation of 
 authors = ["Daniel Levita"]
 license = "MIT"
 readme = "README.md"
+packages = [
+    { include = "mesil" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
 matplotlib = "^3.6.2"
-python-dotenv = "^0.21.0"
 numpy = "^1.23.4"
 openpyxl = "^3.0.10"
-ipykernel = "^6.17.1"
 pandas = "^1.5.1"
-scipy = "^1.9.3"
-notebook = "^6.5.2"
-plotly = "^5.11.0"
-seaborn = "^0.12.1"
+charset-normalizer = "^3.1.0"
 
 [tool.poetry.group.dev.dependencies]
 blue = "^0.9.1"
 isort = "^5.10.1"
 prospector = "^1.7.7"
 safety = "^2.3.1"
+ipykernel = "^6.19.2"
 
 [tool.poetry.group.test.dependencies]
 pytest = "^7.2.0"
