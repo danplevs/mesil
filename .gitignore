@@ -75,12 +75,12 @@ target/
 # Jupyter NB Checkpoints
 .ipynb_checkpoints/
 
-# Data
+# Project folders
 /data/
-
-# Refs and reports from source control
 /references/
 /reports/
+/templates/
+/notebooks/
 
 # Mac OS-specific storage files
 .DS_Store
@@ -95,11 +95,3 @@ target/
 # Pyenv
 .python-version
 
-# Origin
-/templates
-
-# Powerpoint
-*.pptx
-
-# Notebooks
-/notebooks
