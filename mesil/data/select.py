@@ -1,5 +1,6 @@
 """Column selectors."""
-from typing import Callable, Dict
+from numbers import Number
+from typing import Callable, Dict, List
 
 import pandas as pd
 
@@ -9,20 +10,23 @@ def get_selector(analysis: str) -> Callable[[pd.DataFrame], Dict[pd.Series, pd.S
         'ftir': FTIR_selector,
         'xrd': XRD_selector,
         'tga': TGA_selector,
-        'fls': FLS_selector,
+        'fls-em': FLSEM_selector,
+        'fls-exc': FLSEXC_selector,
     }
     selector = selectors.get(analysis)
     return selector
     
-def FTIR_selector(data: pd.DataFrame) -> Dict[str, int]:
+def FTIR_selector(data: pd.DataFrame, xlim: List[Number]) -> Dict[str, pd.Series]:
     return {"x": data[0], "y": data[1]}
 
-def XRD_selector(data: pd.DataFrame) -> Dict[str, int]:
+def XRD_selector(data: pd.DataFrame, xlim: List[Number]) -> Dict[str, pd.Series]:
     return {"x": data[0], "y": data[1]}
 
-def TGA_selector(data: pd.DataFrame) -> Dict[str, int]:
+def TGA_selector(data: pd.DataFrame, xlim: List[Number]) -> Dict[str, pd.Series]:
     return {"x": data[1], "y": data[4]}
 
-def FLS_selector(data: pd.DataFrame) -> Dict[str, int]:
+def FLSEM_selector(data: pd.DataFrame, xlim: List[Number]) -> Dict[str, pd.Series]:
     return {"x": data[0], "y": data[1]}
-    
+
+def FLSEXC_selector(data: pd.DataFrame, xlim: List[Number]) -> Dict[str, pd.Series]:
+    return {"x": data[0], "y": data[1]}

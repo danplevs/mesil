@@ -1,48 +1,53 @@
+import csv
 from pathlib import Path
-from typing import List
+from typing import List, Union
+
+import pandas as pd
 
 from mesil.config import Settings
+from mesil.data.metadata import get_analysis
 
 
-def read_file_lines(file: Path) -> List[str]:
-    with file.open(encoding='latin-1') as f:
-        lines = f.readlines()
-    return lines
+def read_data(data_file: Path) -> pd.DataFrame:
+    delimiter = get_delimiter(data_file)
+    skip_rows = determine_rows_to_skip(data_file)
+    data = pd.read_csv(data_file, skiprows=skip_rows, sep=delimiter, header=None, encoding="latin1").dropna(axis="columns", how="all")
+    return data
+
+def determine_rows_to_skip(data_file: Path) -> Union[int, None]:
+    analysis = get_analysis(data_file)
+    if analysis == "tga":
+        return 33
+    elif analysis == "fls-em" or analysis == "fls-exc":
+        return 22
+    else:
+        return None
 
 
-def change_extension(file: Path, to_ext: str = '.csv') -> Path:
-    return file.with_suffix(to_ext)
+def get_delimiter(data_file: Path, bytes=22000):
+    sniffer = csv.Sniffer()
+    data = open(data_file, "r").read(bytes)
+    delimiter = sniffer.sniff(data).delimiter
+    return delimiter
+
+
+def change_extension(data_file: Path, to_ext: str = '.csv') -> Path:
+    return data_file.with_suffix(to_ext)
 
 
 def filter_extensions(
-    root: Path = Settings().paths.data.raw, extensions: List[str] = None
+    data_root: Path = Settings().paths.data.raw, extensions: List[str] = None
 ) -> List[Path]:
     if not extensions:
         extensions = ['.txt', '.csv']
-    paths = [p for p in root.glob('**/*') if p.suffix.lower() in extensions]
+    paths = [p for p in data_root.glob('**/*') if p.suffix.lower() in extensions]
     return paths
 
 
 def filter_analysis(
-    root: Path = Settings().paths.data.raw, analyses: List[str] = None
+    data_root: Path = Settings().paths.data.raw, analyses: List[str] = None
 ):
     if not analyses:
-        analyses = ['fls', 'ftir', 'solid-uv', 'tga', 'xrd']
-    paths = []
-    for p in root.glob('**/*'):
-        analysis = p.parts[2]
-        if analysis in analyses:
-            paths.append(p)
+        analyses = ['fls-exc', 'fls-em', 'ftir', 'solid-uv', 'tga', 'xrd']
+    paths = [data_file for data_file in data_root.glob('**/*') if get_analysis(data_file) in analyses]
     return paths
-
-
-def process_data_path(file: Path):
-    file_parts = list(file.parts)
-    file_parts[1] = 'processed'   # change data status
-    out_path = Path(*file_parts)
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    return change_extension(Path(*file_parts))
-
-
-def get_synthesis_code(file: Path) -> str:
-    return file.stem.split("_")[0]
