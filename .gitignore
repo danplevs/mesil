@@ -77,10 +77,11 @@ target/
 
 # Project folders
 /data/
+/img/
+/notebooks/
 /references/
 /reports/
 /templates/
-/notebooks/
 
 # Mac OS-specific storage files
 .DS_Store
