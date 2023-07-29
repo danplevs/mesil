@@ -2,7 +2,7 @@
 name = "mesil"
 version = "0.1.0"
 description = "Source code used in my undergraduate research \"Investigation of cellular internalization and nanovalve endocytosis mechanisms in fluorescence-labeled rod morphology: a treatment for esophageal cancer\"."
-authors = ["Daniel Levita"]
+authors = ["Daniel Levita <71600818+danplevs@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
 packages = [
@@ -34,3 +34,18 @@ mkdocstrings-python = "^1.2.1"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.pytest.ini_options]
+pythonpath = "."
+addopts = "--doctest-modules"
+
+[tool.isort]
+profile = "black"
+line_length = 79
+
+[tool.taskipy.tasks]
+lint = "blue --check --diff . && isort --check --diff ."
+docs = "mkdocs serve"
+pre_test = "task lint"
+test = "pytest -s -x --cov=mesil -vv"
+post_test = "coverage html"
