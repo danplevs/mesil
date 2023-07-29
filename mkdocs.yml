@@ -1,0 +1,16 @@
+site_name: mesil
+repo_url: https://github.com/danplevs/mesil
+repo_name: danplevs/mesil
+edit_uri: tree/main/docs
+
+theme:
+  name: material
+  language: pt-BR
+  logo: assets/mesil-icon.png
+  favicon: assets/mesil-icon.png
+
+markdown_extensions:
+  - attr_list
+
+extra_css:
+  - stylesheets/extra.css
