@@ -19,4 +19,3 @@ def percentage_by_first_value(array: npt.ArrayLike) -> npt.ArrayLike:
 
 def add_tga_weight(data: pd.DataFrame) -> pd.DataFrame:
     data[4] = percentage_by_first_value(data[3])
-    return data

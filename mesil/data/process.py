@@ -1,35 +1,34 @@
-import io
 import logging
 from pathlib import Path
 
 import pandas as pd
 
-from mesil.data.cleanse import cleanse_data
-from mesil.data.files import (filter_analysis, filter_extensions,
-                              process_data_path, read_file_lines)
-from mesil.data.filter import filter_numeric_data
+from mesil.data.files import (change_extension, filter_analysis, filter_extensions, read_data)
+from mesil.data.metadata import get_analysis
 from mesil.data.transform import add_tga_weight
-from mesil.data.utils import use_whitespace_delimiter
 
 logging.basicConfig(level=logging.INFO)
 
 
-def process_data(file: Path) -> pd.DataFrame:
-    original_data = read_file_lines(file)
-    clean_data = cleanse_data(original_data)
-    filtered_data = filter_numeric_data(clean_data)
-    delim_whitespace = use_whitespace_delimiter(filtered_data[0])
-    dataframe = pd.read_csv(
-        io.StringIO('\n'.join(filtered_data)),
-        delim_whitespace=delim_whitespace,
-        header=None,
-    )
-    return dataframe
+def process_data(data_file: Path) -> pd.DataFrame:
+    origin = read_data(data_file)
+    clean_data = origin.dropna(axis="columns").dropna(axis="index")
+    if get_analysis(data_file) == "tga":
+        add_tga_weight(clean_data)
+    return clean_data
 
 
-def write_data(data: pd.DataFrame, path: Path):
+def process_path(data_file: Path) -> Path:
+    file_parts = list(data_file.parts)
+    file_parts[1] = 'processed'   # change data status
+    out_path = Path(*file_parts)
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    return change_extension(Path(*file_parts))
+
+
+def write_data(data: pd.DataFrame, to_path: Path):
     data.to_csv(
-        process_data_path(path),
+        process_path(to_path),
         sep=',',
         header=False,
         index=False,
@@ -43,12 +42,11 @@ def main():
     ]
     for file in files_to_process:
         data = process_data(file.resolve())
-        if file.parts[2] == 'tga':
-            add_tga_weight(data)
-        output_path = process_data_path(file)
+        output_path = process_path(file)
         write_data(data, output_path)
-
+        
         logging.info(f'Processed {file} -> {output_path}')
+        
     logging.info('SUCCESS: processed all files!')
 
 
