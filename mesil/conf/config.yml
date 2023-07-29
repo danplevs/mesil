@@ -1,8 +1,0 @@
-paths:
-  data:
-    raw: ./data/raw/
-    external: ./data/external/
-    interim: ./data/interim/
-    processed: ./data/processed/
-  style_sheets: ./mesil/conf/style_sheets/
-  figures: ./reports/figures/
