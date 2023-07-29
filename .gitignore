@@ -96,3 +96,5 @@ target/
 # Pyenv
 .python-version
 
+# Notas
+notas.md
