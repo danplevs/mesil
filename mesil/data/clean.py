@@ -5,6 +5,14 @@ import pandas as pd
 
 
 def set_cleaner(analysis: 'str') -> Callable[[pd.DataFrame], pd.DataFrame]:
+    """Set the appropriate data cleaner based on the analysis.
+
+    Args:
+        extension (str): Characterization analysis.
+
+    Returns:
+        Callable[[Path], pd.DataFrame]: Data cleaner function.
+    """
     cleaners = {
         'asap': clean_asap,
         'fls-em': clean_fls,

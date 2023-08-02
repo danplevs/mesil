@@ -32,7 +32,8 @@ class DataFile:
         path: File's path.
         analysis: Analysis's acronym.
         delimiter: Data separator in csv files.
-        raw_data: Raw dataframe, as is in file.
+        raw_data: Raw data, as is in file.
+        clean_data: Clean data.
         processed_data: Clean and transformed data.
 
     Examples:
@@ -46,8 +47,9 @@ class DataFile:
     analysis: str
     delimiter: str = field(init=False)
     raw_data: pd.DataFrame = field(init=False, repr=False)
+    clean_data: pd.DataFrame = field(init=False, repr=False)
     processed_data: pd.DataFrame = field(init=False, repr=False)
-    _clean_data: pd.DataFrame = field(init=False, repr=False)
+    
 
     def validate_path(self, path, **_) -> Path:
         """Ensures that input path is casted as Pathlib's Path object,
@@ -114,6 +116,11 @@ class DataFile:
         )
 
     def read(self) -> DataFile:
+        """Read data in formats csv, xls or xlsx from `path` and store it in `raw_data`.
+
+        Returns:
+            DataFile: `DataFile` with raw data, as is in file.
+        """
         reader = set_reader(self.path.suffix)
         skip_rows = (
             31 if self.analysis == 'tga' else None
@@ -122,8 +129,13 @@ class DataFile:
         return self
 
     def clean(self) -> DataFile:
+        """Clean a copy of the data contained in `raw_data` and store it in `clean_data`
+
+        Returns:
+            DataFile: `DataFile` with clean data. 
+        """
         cleaner = set_cleaner(self.analysis)
-        self._clean_data = cleaner(self.raw_data)
+        self.clean_data = cleaner(self.raw_data)
         return self
         ...
 

@@ -8,7 +8,7 @@ from mesil.data.datafile import DataFile
 
 @pytest.fixture(scope='function')
 def data_file(datafile_args) -> pd.DataFrame:
-    return DataFile(*datafile_args).read().clean()._clean_data
+    return DataFile(*datafile_args).read().clean().clean_data
 
 
 @pytest.mark.parametrize(
