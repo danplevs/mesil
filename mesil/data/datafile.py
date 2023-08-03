@@ -1,8 +1,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+import os
 from pathlib import Path
-from typing import Union
+from typing import TypeAlias, Union
 
 import pandas as pd
 
@@ -21,6 +22,7 @@ SUPPORTED_ANALYSES = [
     'xrf',
 ]
 
+PathLike: TypeAlias = Union[os.PathLike, str]
 
 @dataclass
 class DataFile:
@@ -43,7 +45,7 @@ class DataFile:
         >>> DataFile(path='data/raw/asap/2023-04-19/DIC14.XLS', analysis='ASAP')
         DataFile(path=WindowsPath('data/raw/asap/2023-04-19/DIC14.XLS'), analysis='asap', delimiter='')
     """
-    path: Union[Path, str]
+    path: PathLike
     analysis: str
     delimiter: str = field(init=False)
     raw_data: pd.DataFrame = field(init=False, repr=False)
