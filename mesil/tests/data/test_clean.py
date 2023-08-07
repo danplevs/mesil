@@ -54,7 +54,7 @@ class TestTGA:
     def test_clean_tga_returns_correct_column_names(
         self, data_file: pd.DataFrame
     ):
-        assert all(data_file.columns == ['time', 'temperature', 'DTA', 'TGA'])
+        assert all(data_file.columns == ['time', 'temperature', 'dta', 'tga'])
 
     def test_clean_tga_dtypes_should_be_float64(self, data_file: pd.DataFrame):
         assert all(data_file.dtypes == 'float64')

@@ -49,7 +49,7 @@ def clean_tga(raw_data: pd.DataFrame) -> pd.DataFrame:
     clean_data = raw_data.copy()
     clean_data = clean_data.drop(range(2))
     clean_data = clean_data.apply(pd.to_numeric)
-    clean_data.columns = ['time', 'temperature', 'DTA', 'TGA']
+    clean_data.columns = ['time', 'temperature', 'dta', 'tga']
     return clean_data
 
 
