@@ -129,19 +129,42 @@ class DataFile:
         self.raw_data = reader(self.path, skip_rows=skip_rows)
         return self
 
-    def clean(self) -> DataFile:
-        """Clean a copy of the data contained in `raw_data` and store it in `clean_data`
+    def clean(self) -> Self:
+        """Clean a copy of the data contained in `raw_data`, according to the analysis,
+        and store it in `clean_data`.
 
         Returns:
-            DataFile: `DataFile` with clean data. 
+            Self: `DataFile` with clean data.
         """
         cleaner = set_cleaner(self.analysis)
         self.clean_data = cleaner(self.raw_data)
         return self
         ...
 
-    def transform(self) -> DataFile:
+    def transform(self) -> Self:
+        """Tranform data in `clean_data`, according to the analysis,
+        and store it in `processed_data`
+
+        Returns:
+            Self: `DataFile` with processed data.
+        """
+        transform = set_transformer(self.analysis)
+        self.processed_data = transform(self.clean_data)
+        return self
         ...
 
-    def export(self):
-        ...
+    def export(self, output: PathLike = None, sep: str = ',') -> Self:
+        """Export `processed_data` to a csv file.
+
+        Args:
+            output (PathLike, optional): Optional dir to export data. Defaults to None.
+            sep (str, optional): CSV file delimiter. Defaults to ','.
+        """
+        path_to_append = f'processed/{self.analysis}'
+        if not output:
+            output = self.path.parent / path_to_append
+        else:
+            output = Path(output) / path_to_append
+        output.mkdir(parents=True, exist_ok=True)
+        self.processed_data.to_csv(output / f'{self.path.stem}.csv', sep=sep)
+        return Self

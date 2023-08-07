@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
@@ -53,3 +55,27 @@ class TestDataFile:
             path='data/raw/asap/2023-04-19/DIC14.XLS', analysis='asap'
         ).read()
         assert isinstance(data_file.raw_data, pd.DataFrame)
+
+    def test_datafile_export_when_output_is_none(self):
+        test_path = Path('data/raw/asap/2023-04-19/DIC14.XLS')
+        data_file = (
+            DataFile(path=test_path, analysis='asap')
+            .read()
+            .clean()
+            .transform()
+            .export()
+        )
+        assert Path(
+            test_path.parent, 'processed', 'asap', 'DIC14.csv'
+        ).exists()
+
+    def test_datafile_export_when_output_is_passed(self, output='data'):
+        test_path = Path('data/raw/asap/2023-04-19/DIC14.XLS')
+        data_file = (
+            DataFile(test_path, 'asap')
+            .read()
+            .clean()
+            .transform()
+            .export(output)
+        )
+        assert Path(output, 'processed', 'asap', 'DIC14.csv').exists()
