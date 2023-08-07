@@ -1,14 +1,13 @@
-from __future__ import annotations
-
-from dataclasses import dataclass, field
 import os
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import TypeAlias, Union
+from typing import Self, TypeAlias, Union
 
 import pandas as pd
 
 from mesil.data.clean import set_cleaner
 from mesil.data.read import get_delimiter, set_reader
+from mesil.data.transform import set_transformer
 
 SUPPORTED_EXTENSIONS = ['.csv', '.txt', '.xls', '.xlsx']
 SUPPORTED_ANALYSES = [
@@ -23,6 +22,7 @@ SUPPORTED_ANALYSES = [
 ]
 
 PathLike: TypeAlias = Union[os.PathLike, str]
+
 
 @dataclass
 class DataFile:
@@ -45,15 +45,14 @@ class DataFile:
         >>> DataFile(path='data/raw/asap/2023-04-19/DIC14.XLS', analysis='ASAP')
         DataFile(path=WindowsPath('data/raw/asap/2023-04-19/DIC14.XLS'), analysis='asap', delimiter='')
     """
-    path: PathLike
+    path: Path
     analysis: str
     delimiter: str = field(init=False)
     raw_data: pd.DataFrame = field(init=False, repr=False)
     clean_data: pd.DataFrame = field(init=False, repr=False)
     processed_data: pd.DataFrame = field(init=False, repr=False)
-    
 
-    def validate_path(self, path, **_) -> Path:
+    def validate_path(self, path: PathLike, **_) -> Path:
         """Ensures that input path is casted as Pathlib's Path object,
         check if it exists, and if the extension is supported.
 
@@ -80,7 +79,7 @@ class DataFile:
             )
         return path
 
-    def validate_analysis(self, analysis, **_) -> str:
+    def validate_analysis(self, analysis: str, **_) -> str:
         """Ensures analysis is stored in lowercase and that is supported.
 
         Args:
@@ -117,11 +116,11 @@ class DataFile:
             else ''
         )
 
-    def read(self) -> DataFile:
+    def read(self) -> Self:
         """Read data in formats csv, xls or xlsx from `path` and store it in `raw_data`.
 
         Returns:
-            DataFile: `DataFile` with raw data, as is in file.
+            Self: `DataFile` with raw data, as is in file.
         """
         reader = set_reader(self.path.suffix)
         skip_rows = (
