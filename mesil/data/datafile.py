@@ -1,13 +1,13 @@
-from __future__ import annotations
-
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Union
+from typing import Self, TypeAlias, Union
 
 import pandas as pd
 
 from mesil.data.clean import set_cleaner
 from mesil.data.read import get_delimiter, set_reader
+from mesil.data.transform import set_transformer
 
 SUPPORTED_EXTENSIONS = ['.csv', '.txt', '.xls', '.xlsx']
 SUPPORTED_ANALYSES = [
@@ -20,6 +20,8 @@ SUPPORTED_ANALYSES = [
     'xrd',
     'xrf',
 ]
+
+PathLike: TypeAlias = Union[os.PathLike, str]
 
 
 @dataclass
@@ -43,15 +45,14 @@ class DataFile:
         >>> DataFile(path='data/raw/asap/2023-04-19/DIC14.XLS', analysis='ASAP')
         DataFile(path=WindowsPath('data/raw/asap/2023-04-19/DIC14.XLS'), analysis='asap', delimiter='')
     """
-    path: Union[Path, str]
+    path: Path
     analysis: str
     delimiter: str = field(init=False)
     raw_data: pd.DataFrame = field(init=False, repr=False)
     clean_data: pd.DataFrame = field(init=False, repr=False)
     processed_data: pd.DataFrame = field(init=False, repr=False)
-    
 
-    def validate_path(self, path, **_) -> Path:
+    def validate_path(self, path: PathLike, **_) -> Path:
         """Ensures that input path is casted as Pathlib's Path object,
         check if it exists, and if the extension is supported.
 
@@ -78,7 +79,7 @@ class DataFile:
             )
         return path
 
-    def validate_analysis(self, analysis, **_) -> str:
+    def validate_analysis(self, analysis: str, **_) -> str:
         """Ensures analysis is stored in lowercase and that is supported.
 
         Args:
@@ -115,11 +116,11 @@ class DataFile:
             else ''
         )
 
-    def read(self) -> DataFile:
+    def read(self) -> Self:
         """Read data in formats csv, xls or xlsx from `path` and store it in `raw_data`.
 
         Returns:
-            DataFile: `DataFile` with raw data, as is in file.
+            Self: `DataFile` with raw data, as is in file.
         """
         reader = set_reader(self.path.suffix)
         skip_rows = (
@@ -128,19 +129,42 @@ class DataFile:
         self.raw_data = reader(self.path, skip_rows=skip_rows)
         return self
 
-    def clean(self) -> DataFile:
-        """Clean a copy of the data contained in `raw_data` and store it in `clean_data`
+    def clean(self) -> Self:
+        """Clean a copy of the data contained in `raw_data`, according to the analysis,
+        and store it in `clean_data`.
 
         Returns:
-            DataFile: `DataFile` with clean data. 
+            Self: `DataFile` with clean data.
         """
         cleaner = set_cleaner(self.analysis)
         self.clean_data = cleaner(self.raw_data)
         return self
         ...
 
-    def transform(self) -> DataFile:
+    def transform(self) -> Self:
+        """Tranform data in `clean_data`, according to the analysis,
+        and store it in `processed_data`
+
+        Returns:
+            Self: `DataFile` with processed data.
+        """
+        transform = set_transformer(self.analysis)
+        self.processed_data = transform(self.clean_data)
+        return self
         ...
 
-    def export(self):
-        ...
+    def export(self, output: PathLike = None, sep: str = ',') -> Self:
+        """Export `processed_data` to a csv file.
+
+        Args:
+            output (PathLike, optional): Optional dir to export data. Defaults to None.
+            sep (str, optional): CSV file delimiter. Defaults to ','.
+        """
+        path_to_append = f'processed/{self.analysis}'
+        if not output:
+            output = self.path.parent / path_to_append
+        else:
+            output = Path(output) / path_to_append
+        output.mkdir(parents=True, exist_ok=True)
+        self.processed_data.to_csv(output / f'{self.path.stem}.csv', sep=sep)
+        return Self
