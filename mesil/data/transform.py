@@ -13,16 +13,9 @@ def set_transformer(analysis: str) -> Callable[[pd.DataFrame], pd.DataFrame]:
         Callable[[Path], pd.DataFrame]: Data cleaner function.
     """
     transformers = {
-        'asap': transform_nothing,
-        'fls-em': transform_nothing,
-        'fls-exc': transform_nothing,
-        'ftir': transform_nothing,
-        'solid-uv': transform_nothing,
         'tga': transform_tga,
-        'xrd': transform_nothing,
-        'xrf': transform_nothing,
     }
-    return transformers.get(analysis)
+    return transformers.get(analysis, transform_nothing)
 
 
 def transform_tga(data: pd.DataFrame) -> pd.DataFrame:
