@@ -5,9 +5,9 @@ from typing import Self, TypeAlias, Union
 
 import pandas as pd
 
-from mesil.data.clean import set_cleaner
-from mesil.data.read import get_delimiter, set_reader
-from mesil.data.transform import set_transformer
+from mesil.process.clean import set_cleaner
+from mesil.process.read import get_delimiter, set_reader
+from mesil.process.transform import set_transformer
 
 SUPPORTED_EXTENSIONS = ['.csv', '.txt', '.xls', '.xlsx']
 SUPPORTED_ANALYSES = [
