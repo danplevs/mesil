@@ -1,7 +1,7 @@
 import pandas as pd
 import pytest
 
-from mesil.data.read import csv_reader, excel_reader, get_delimiter
+from mesil.process.read import csv_reader, excel_reader, get_delimiter
 
 test_csv_reader_data = [
     ('data/raw/fls-em/2023-05-15/DIC14.txt', None),

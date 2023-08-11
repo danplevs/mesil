@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from mesil.data.datafile import DataFile
+from mesil.process.datafile import DataFile
 
 test_datafile_read_csv_data = [
     ('data/raw/fls-em/2023-05-15/DIC14.txt', 'fls-em'),
@@ -34,9 +34,7 @@ class TestDataFile:
             DataFile(path='pyproject.toml', analysis='tga')
 
     def test_raise_error_analysis_not_supported(self):
-        with pytest.raises(
-            ValueError, match='.* analysis not supported, try one of .*'
-        ):
+        with pytest.raises(ValueError, match='.* is not a valid Analysis'):
             DataFile(path='data/raw/xrf/2023-02-07/DIC3L.csv', analysis='eds')
 
     def test_uppercase_analysis_validation(self):

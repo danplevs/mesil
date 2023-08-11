@@ -3,7 +3,7 @@ from pathlib import Path
 import pandas as pd
 import pytest
 
-from mesil.data.datafile import DataFile
+from mesil.process.datafile import DataFile
 
 
 @pytest.fixture(scope='function')

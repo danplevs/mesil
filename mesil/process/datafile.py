@@ -1,25 +1,37 @@
 import os
 from dataclasses import dataclass, field
+from enum import StrEnum, auto
 from pathlib import Path
 from typing import Self, TypeAlias, Union
 
 import pandas as pd
 
-from mesil.data.clean import set_cleaner
-from mesil.data.read import get_delimiter, set_reader
-from mesil.data.transform import set_transformer
+from mesil.process.clean import set_cleaner
+from mesil.process.read import get_delimiter, set_reader
+from mesil.process.transform import set_transformer
 
-SUPPORTED_EXTENSIONS = ['.csv', '.txt', '.xls', '.xlsx']
-SUPPORTED_ANALYSES = [
-    'asap',
-    'fls-em',
-    'fls-exc',
-    'ftir',
-    'solid-uv',
-    'tga',
-    'xrd',
-    'xrf',
-]
+
+class Extension(StrEnum):
+    csv = '.csv'
+    txt = '.txt'
+    xls = '.xls'
+    xlsx = '.xlsx'
+
+
+class Analysis(StrEnum):
+    asap = auto()
+    fls_em = 'fls-em'
+    fls_exc = 'fls-exc'
+    ftir = auto()
+    solid_uv = 'solid-uv'
+    tga = auto()
+    xrd = auto()
+    xrf = auto()
+    infer = auto()
+
+
+SUPPORTED_EXTENSIONS = [member.value for member in Extension]
+SUPPORTED_ANALYSES = [member.value for member in Analysis]
 
 PathLike: TypeAlias = Union[os.PathLike, str]
 
@@ -46,13 +58,13 @@ class DataFile:
         DataFile(path=WindowsPath('data/raw/asap/2023-04-19/DIC14.XLS'), analysis='asap', delimiter='')
     """
     path: Path
-    analysis: str
+    analysis: Analysis
     delimiter: str = field(init=False)
     raw_data: pd.DataFrame = field(init=False, repr=False)
     clean_data: pd.DataFrame = field(init=False, repr=False)
     processed_data: pd.DataFrame = field(init=False, repr=False)
 
-    def validate_path(self, path: PathLike, **_) -> Path:
+    def validate_path(self, path: Path, **_) -> Path:
         """Ensures that input path is casted as Pathlib's Path object,
         check if it exists, and if the extension is supported.
 
@@ -91,10 +103,10 @@ class DataFile:
         Returns:
             str: Validated analysis
         """
-        analysis = analysis.lower()
+        analysis = Analysis(analysis.lower())
         if not analysis in SUPPORTED_ANALYSES:
             raise ValueError(
-                f'{analysis.upper()} analysis not supported, try one of {SUPPORTED_ANALYSES}'
+                f'{analysis.value.upper()} analysis not supported, try one of {SUPPORTED_ANALYSES}'
             )
         return analysis
 
@@ -153,7 +165,7 @@ class DataFile:
         return self
         ...
 
-    def export(self, output: PathLike = None, sep: str = ',') -> Self:
+    def export(self, output: Path = None, sep: str = ',') -> Self:
         """Export `processed_data` to a csv file.
 
         Args:
@@ -166,5 +178,8 @@ class DataFile:
         else:
             output = Path(output) / path_to_append
         output.mkdir(parents=True, exist_ok=True)
-        self.processed_data.to_csv(output / f'{self.path.stem}.csv', sep=sep)
+        self._output = output / f'{self.path.stem}.csv'
+        self.processed_data.to_csv(
+            self._output, sep=sep, index=False
+        )
         return Self
