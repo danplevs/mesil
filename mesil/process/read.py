@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Callable, Optional, Union
 
 import pandas as pd
+import xlrd
 
 
 def get_delimiter(data_file: Path, bytes=22000) -> str:
@@ -55,7 +56,8 @@ def excel_reader(
     Returns:
         pd.DataFrame: Tabular data contained in the excel file.
     """
-    return pd.read_excel(data_file, engine=engine, skiprows=skip_rows)
+    wb = xlrd.open_workbook(data_file, encoding_override='iso-8859-1')
+    return pd.read_excel(wb, engine=engine, skiprows=skip_rows)
     ...
 
 
