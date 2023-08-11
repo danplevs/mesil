@@ -1,5 +1,6 @@
 import os
 from dataclasses import dataclass, field
+from enum import StrEnum, auto
 from pathlib import Path
 from typing import Self, TypeAlias, Union
 
@@ -9,17 +10,28 @@ from mesil.process.clean import set_cleaner
 from mesil.process.read import get_delimiter, set_reader
 from mesil.process.transform import set_transformer
 
-SUPPORTED_EXTENSIONS = ['.csv', '.txt', '.xls', '.xlsx']
-SUPPORTED_ANALYSES = [
-    'asap',
-    'fls-em',
-    'fls-exc',
-    'ftir',
-    'solid-uv',
-    'tga',
-    'xrd',
-    'xrf',
-]
+
+class Extension(StrEnum):
+    csv = '.csv'
+    txt = '.txt'
+    xls = '.xls'
+    xlsx = '.xlsx'
+
+
+class Analysis(StrEnum):
+    asap = auto()
+    fls_em = 'fls-em'
+    fls_exc = 'fls-exc'
+    ftir = auto()
+    solid_uv = 'solid-uv'
+    tga = auto()
+    xrd = auto()
+    xrf = auto()
+    infer = auto()
+
+
+SUPPORTED_EXTENSIONS = [member.value for member in Extension]
+SUPPORTED_ANALYSES = [member.value for member in Analysis]
 
 PathLike: TypeAlias = Union[os.PathLike, str]
 
