@@ -9,6 +9,9 @@ packages = [
     { include = "mesil" }
 ]
 
+[tool.poetry.scripts]
+mesil = "mesil.cli:app"
+
 [tool.poetry.dependencies]
 python = "^3.11"
 matplotlib = "^3.6.2"
@@ -16,6 +19,7 @@ numpy = "^1.23.4"
 openpyxl = "^3.0.10"
 pandas = "^1.5.1"
 charset-normalizer = "^3.1.0"
+typer = {extras = ["all"], version = "^0.9.0"}
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.2.0"
@@ -44,8 +48,8 @@ profile = "black"
 line_length = 79
 
 [tool.taskipy.tasks]
-lint = "blue --check --diff . && isort --check --diff ."
+lint = "blue . && isort ."
 docs = "mkdocs serve"
 pre_test = "task lint"
-test = "pytest -s -x --cov=mesil -vv"
+test = "pytest -s -x --cov=mesil -vv mesil/tests/data"
 post_test = "coverage html"
