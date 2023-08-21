@@ -1,16 +1,19 @@
 import importlib.metadata
 from pathlib import Path
-from time import sleep
-import time
 from typing import Annotated
 
 import typer
 from rich.console import Console
-from rich.progress import Progress
+from rich.progress import (
+    Progress,
+    TextColumn,
+    TimeRemainingColumn,
+    MofNCompleteColumn,
+    BarColumn,
+)
 
 from mesil.process.analysis import infer_analysis
 from mesil.process.datafile import (
-    SUPPORTED_ANALYSES,
     SUPPORTED_EXTENSIONS,
     Analysis,
     DataFile,
@@ -89,6 +92,8 @@ def process(
     If --output is passed, data will be exported in the provided path,
     otherwise in dir_or_file.
     """
+    console = Console()
+
     if path.is_file():
         infered_analysis = (
             infer_analysis(path) if analysis == 'infer' else analysis
@@ -98,16 +103,26 @@ def process(
         console.log(f'[green bold]✅ Success![/] Exported {data_file._output}')
         return
 
-    console = Console()
-    with console.status('[bold blue]Processing files...[/]') as status:
-        for file in path.glob('**/*'):
+    with Progress(
+        TextColumn('[progress.description]{task.description}'),
+        BarColumn(),
+        MofNCompleteColumn(),
+        TimeRemainingColumn()
+    ) as progress:
+        glob = [p for p in path.glob('**/*') if p.suffix.lower() in SUPPORTED_EXTENSIONS]
+        total_processed = 0
+        for file in progress.track(glob, description='Processing data...'):
             if file.suffix.lower() in SUPPORTED_EXTENSIONS:
                 infered_analysis = (
                     infer_analysis(file) if analysis == 'infer' else analysis
                 )
                 data_file = DataFile(path=file, analysis=infered_analysis)
                 data_file.read().clean().transform().export(output=output)
-                console.log(f'[green bold]✅ Success![/] Exported {data_file._output}')
+                total_processed += 1
+
+    console.print(
+        f'[green bold]✅ Success![/] Processed {total_processed} files'
+    )
 
 
 @app.command()
