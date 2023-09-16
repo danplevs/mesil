@@ -5,19 +5,15 @@ from typing import Annotated
 import typer
 from rich.console import Console
 from rich.progress import (
+    BarColumn,
+    MofNCompleteColumn,
     Progress,
     TextColumn,
-    TimeRemainingColumn,
-    MofNCompleteColumn,
-    BarColumn,
+    TimeElapsedColumn,
 )
 
 from mesil.process.analysis import infer_analysis
-from mesil.process.datafile import (
-    SUPPORTED_EXTENSIONS,
-    Analysis,
-    DataFile,
-)
+from mesil.process.datafile import SUPPORTED_EXTENSIONS, Analysis, DataFile
 
 
 def docstr_callback():
@@ -107,9 +103,13 @@ def process(
         TextColumn('[progress.description]{task.description}'),
         BarColumn(),
         MofNCompleteColumn(),
-        TimeRemainingColumn()
+        TimeElapsedColumn()
     ) as progress:
-        glob = [p for p in path.glob('**/*') if p.suffix.lower() in SUPPORTED_EXTENSIONS]
+        glob = [
+            p
+            for p in path.glob('**/*')
+            if p.suffix.lower() in SUPPORTED_EXTENSIONS
+        ]
         total_processed = 0
         for file in progress.track(glob, description='Processing data...'):
             if file.suffix.lower() in SUPPORTED_EXTENSIONS:
