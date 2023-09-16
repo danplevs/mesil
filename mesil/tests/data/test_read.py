@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import pandas as pd
 import pytest
 
@@ -36,6 +38,13 @@ def test_csv_reader(csv_path, skip_rows):
     assert isinstance(data, pd.DataFrame)
 
 
-def test_excel_reader():
-    data = excel_reader('data/raw/asap/2023-04-19/DIC14.XLS')
+@pytest.mark.parametrize(
+    'excel_path, engine',
+    [
+        (Path('data/raw/asap/2023-04-19/DIC14.XLS'), 'xlrd'),
+        (Path('data/raw/dls-size/MC034_G0_A (1).xlsx'), 'openpyxl'),
+    ],
+)
+def test_excel_reader(excel_path: str, engine: str):
+    data = excel_reader(excel_path, engine=engine)
     assert isinstance(data, pd.DataFrame)

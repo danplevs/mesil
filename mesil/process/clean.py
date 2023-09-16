@@ -15,6 +15,7 @@ def set_cleaner(analysis: 'str') -> Callable[[pd.DataFrame], pd.DataFrame]:
     """
     cleaners = {
         'asap': clean_asap,
+        'dls-size': clean_dls_size,
         'fls-em': clean_fls,
         'fls-exc': clean_fls,
         'ftir': clean_ftir,
@@ -24,6 +25,33 @@ def set_cleaner(analysis: 'str') -> Callable[[pd.DataFrame], pd.DataFrame]:
         'xrf': clean_xrf,
     }
     return cleaners.get(analysis)
+
+
+def clean_asap(raw_data: pd.DataFrame) -> pd.DataFrame:
+    clean_data = raw_data.iloc[28:, np.r_[16:20, 120:122]]
+    clean_data.columns = [
+        'relative_pressure_adsorption',
+        'quantity_adsorbed',
+        'relative_pressure_desorption',
+        'quantity_desorbed',
+        'pore_diameter',
+        'log_diff_pore_volume',
+    ]
+    clean_data = clean_data.apply(pd.to_numeric)
+    clean_data = clean_data.dropna(how='all')
+    return clean_data
+
+
+def clean_dls_size(raw_data: pd.DataFrame) -> pd.DataFrame:
+    clean_data = raw_data.iloc[8:, 24:]
+    clean_data = clean_data.apply(pd.to_numeric)
+    clean_data.columns = [
+        'particle_diameter',
+        'size_per_surface',
+        'size_per_volume',
+        'size_per_number',
+    ]
+    return clean_data
 
 
 def clean_fls(raw_data: pd.DataFrame) -> pd.DataFrame:
@@ -71,19 +99,4 @@ def clean_xrf(raw_data: pd.DataFrame) -> pd.DataFrame:
             'w/o_normal': 'float64',
         }
     )
-    return clean_data
-
-
-def clean_asap(raw_data: pd.DataFrame) -> pd.DataFrame:
-    clean_data = raw_data.iloc[28:, np.r_[16:20, 120:122]]
-    clean_data.columns = [
-        'relative_pressure_adsorption',
-        'quantity_adsorbed',
-        'relative_pressure_desorption',
-        'quantity_desorbed',
-        'pore_diameter',
-        'log_diff_pore_volume',
-    ]
-    clean_data = clean_data.apply(pd.to_numeric)
-    clean_data = clean_data.dropna(how='all')
     return clean_data

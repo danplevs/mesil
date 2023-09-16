@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pandas as pd
 import pytest
 
@@ -9,6 +7,32 @@ from mesil.process.datafile import DataFile
 @pytest.fixture(scope='function')
 def data_file(datafile_args) -> pd.DataFrame:
     return DataFile(*datafile_args).read().clean().clean_data
+
+
+@pytest.mark.parametrize(
+    'datafile_args', [('data/raw/asap/2023-04-19/DIC14.XLS', 'asap')]
+)
+class TestASAP:
+    def test_clean_asap_returns_correct_column_names(
+        self, data_file: pd.DataFrame
+    ):
+        assert all(
+            data_file.columns
+            == [
+                'relative_pressure_adsorption',
+                'quantity_adsorbed',
+                'relative_pressure_desorption',
+                'quantity_desorbed',
+                'pore_diameter',
+                'log_diff_pore_volume',
+            ]
+        )
+
+    def test_clean_asap_returns_correct_dtypes(self, data_file: pd.DataFrame):
+        assert all(data_file.dtypes == 'float64')
+
+    def test_clean_tga_nan_rows_should_be_false(self, data_file: pd.DataFrame):
+        assert all(data_file.isnull().all(axis='columns') == False)
 
 
 @pytest.mark.parametrize(
@@ -36,15 +60,23 @@ class TestFLS:
 @pytest.mark.parametrize(
     'datafile_args', [('data/raw/ftir/2023-04-18/DIC14.CSV', 'ftir')]
 )
-def test_clean_ftir_returns_correct_column_names(data_file: pd.DataFrame):
-    assert all(data_file.columns == ['wavenumber', 'transmittance'])
+class TestFTIR:
+    def test_clean_ftir_returns_correct_column_names(
+        self, data_file: pd.DataFrame
+    ):
+        assert all(data_file.columns == ['wavenumber', 'transmittance'])
 
 
 @pytest.mark.parametrize(
-    'datafile_args', [('data/raw/solid-uv/2023-02-02/DIC3L.txt', 'solid-uv')]
+    'datafile_args',
+    [('data/raw/solid-uv/2023-02-02/DIC3L.txt', 'solid-uv')],
 )
-def test_clean_solid_uv_returns_correct_column_names(data_file: pd.DataFrame):
-    assert all(data_file.columns == ['wavelength', 'absorbance'])
+class TestSolidUV:
+    def test_clean_solid_uv_returns_correct_column_names(
+        self,
+        data_file: pd.DataFrame,
+    ):
+        assert all(data_file.columns == ['wavelength', 'absorbance'])
 
 
 @pytest.mark.parametrize(
@@ -63,8 +95,11 @@ class TestTGA:
 @pytest.mark.parametrize(
     'datafile_args', [('data/raw/xrd/2023-04-14/DIC14.txt', 'xrd')]
 )
-def test_clean_xrd_returns_correct_column_names(data_file: pd.DataFrame):
-    assert all(data_file.columns == ['2theta', 'intensity'])
+class TestXRD:
+    def test_clean_xrd_returns_correct_column_names(
+        self, data_file: pd.DataFrame
+    ):
+        assert all(data_file.columns == ['2theta', 'intensity'])
 
 
 @pytest.mark.parametrize(
@@ -100,29 +135,3 @@ class TestXRF:
                 'float64',
             ]
         )
-
-
-@pytest.mark.parametrize(
-    'datafile_args', [('data/raw/asap/2023-04-19/DIC14.XLS', 'asap')]
-)
-class TestASAP:
-    def test_clean_asap_returns_correct_column_names(
-        self, data_file: pd.DataFrame
-    ):
-        assert all(
-            data_file.columns
-            == [
-                'relative_pressure_adsorption',
-                'quantity_adsorbed',
-                'relative_pressure_desorption',
-                'quantity_desorbed',
-                'pore_diameter',
-                'log_diff_pore_volume',
-            ]
-        )
-
-    def test_clean_asap_returns_correct_dtypes(self, data_file: pd.DataFrame):
-        assert all(data_file.dtypes == 'float64')
-
-    def test_clean_tga_nan_rows_should_be_false(self, data_file: pd.DataFrame):
-        assert all(data_file.isnull().all(axis='columns') == False)
