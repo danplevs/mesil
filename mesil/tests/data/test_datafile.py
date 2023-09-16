@@ -48,7 +48,14 @@ class TestDataFile:
         data_file = DataFile(path=csv_path, analysis=analysis).read()
         assert isinstance(data_file.raw_data, pd.DataFrame)
 
-    def test_datafile_read_excel(self):
+    @pytest.mark.parametrize(
+        'excel_path, analysis',
+        [
+            ('data/raw/asap/2023-04-19/DIC14.XLS', 'asap'),
+            ('data/raw/dls-size/MC034_G0_A (1).xlsx', 'dls-size'),
+        ],
+    )
+    def test_datafile_read_excel(self, excel_path: str, analysis: str):
         data_file = DataFile(
             path='data/raw/asap/2023-04-19/DIC14.XLS', analysis='asap'
         ).read()

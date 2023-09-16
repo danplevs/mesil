@@ -20,6 +20,8 @@ class Extension(StrEnum):
 
 class Analysis(StrEnum):
     asap = auto()
+    dls_size = 'dls-size'
+    dls_zeta = 'dls-zeta'
     fls_em = 'fls-em'
     fls_exc = 'fls-exc'
     ftir = auto()
@@ -30,8 +32,8 @@ class Analysis(StrEnum):
     infer = auto()
 
 
-SUPPORTED_EXTENSIONS = [member.value for member in Extension]
-SUPPORTED_ANALYSES = [member.value for member in Analysis]
+SUPPORTED_EXTENSIONS = {member.value for member in Extension}
+SUPPORTED_ANALYSES = {member.value for member in Analysis}
 
 PathLike: TypeAlias = Union[os.PathLike, str]
 
@@ -134,11 +136,18 @@ class DataFile:
         Returns:
             Self: `DataFile` with raw data, as is in file.
         """
-        reader = set_reader(self.path.suffix)
+        extension = self.path.suffix.lower()
+        reader = set_reader(extension)
         skip_rows = (
             31 if self.analysis == 'tga' else None
         )    # especially needed to read tga data
-        self.raw_data = reader(self.path, skip_rows=skip_rows)
+        if extension == '.xls':
+            engine = 'xlrd'
+        elif extension == '.xlsx':
+            engine = 'openpyxl'
+        else:
+            engine = None
+        self.raw_data = reader(self.path, skip_rows=skip_rows, engine=engine)
         return self
 
     def clean(self) -> Self:
@@ -179,7 +188,5 @@ class DataFile:
             output = Path(output) / path_to_append
         output.mkdir(parents=True, exist_ok=True)
         self._output = output / f'{self.path.stem}.csv'
-        self.processed_data.to_csv(
-            self._output, sep=sep, index=False
-        )
+        self.processed_data.to_csv(self._output, sep=sep, index=False)
         return Self

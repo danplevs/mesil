@@ -2,6 +2,7 @@ import csv
 from pathlib import Path
 from typing import Callable, Optional, Union
 
+import openpyxl
 import pandas as pd
 import xlrd
 
@@ -23,7 +24,7 @@ def get_delimiter(data_file: Path, bytes=22000) -> str:
 
 
 def csv_reader(
-    data_file: Union[Path, str], skip_rows: Optional[int] = None
+    data_file: Union[Path, str], skip_rows: Optional[int] = None, engine=None
 ) -> pd.DataFrame:
     """Reads a csv file.
 
@@ -40,11 +41,12 @@ def csv_reader(
         header=None,
         encoding='latin1',
         skiprows=skip_rows,
+        engine=engine,
     )
 
 
 def excel_reader(
-    data_file: Union[Path, str],
+    data_file: Path,
     skip_rows: Optional[int] = None,
     engine: str = 'xlrd',
 ) -> pd.DataFrame:
@@ -56,9 +58,11 @@ def excel_reader(
     Returns:
         pd.DataFrame: Tabular data contained in the excel file.
     """
-    wb = xlrd.open_workbook(data_file, encoding_override='iso-8859-1')
-    return pd.read_excel(wb, engine=engine, skiprows=skip_rows)
-    ...
+    if data_file.suffix.lower() == '.xls':
+        wb = xlrd.open_workbook(data_file, encoding_override='iso-8859-1')
+    elif data_file.suffix.lower() == '.xlsx':
+        wb = openpyxl.load_workbook(data_file)
+    return pd.read_excel(wb, skiprows=skip_rows, engine=engine)
 
 
 def set_reader(extension: str) -> Callable[[Path], pd.DataFrame]:
