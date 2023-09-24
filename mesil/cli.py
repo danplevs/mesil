@@ -19,19 +19,17 @@ from mesil.process.datafile import (
     DataFile,
 )
 
-
+typer.rich_utils.STYLE_HELPTEXT = ""
 def docstr_callback():
     """
-    Process data from several different analyses and plot them.
-
-    [red]Currently supported analyses[/red]:
-        - Accelerated Surface Area and Porosity [green](asap)[/green]
-        - Fluorescence Spectroscopy [green](fls-em, fls-exc)[/green]
-        - Fourier Transformed Infrared Spectroscopy [green](ftir)[/green]
-        - Solid-state UV-Vis Spectroscopy [green](solid-uv)[/green]
-        - Thermogravimetric analysis [green](tga)[/green]
-        - X-Ray diffraction [green](xrd)[/green]
-        - X-Ray fluorescence [green](xrf)[/green]
+    Process and plot scientific data from various analyses (equipment specific).\n
+    \b
+    - [green](asap)[/green] Surface Area and Porosity: [purple]Micromeritics ASAP 2020[/purple] 
+    - [green](fls-em, fls-exc)[/green] Fluorescence Spectroscopy: [purple]Edinburgh FLS980[/purple] 
+    - [green](ftir)[/green] Infrared Spectroscopy: [purple]Varian 600 FTIR[/purple] 
+    - [green](tga)[/green] Thermogravimetric: [purple]Shimadzu DTG-60/60H[/purple] 
+    - [green](xrd)[/green] X-Ray diffraction: [purple]Rigaku Miniflex II[/purple] 
+    - [green](xrf)[/green] X-Ray fluorescence: [purple]Rigaku Supermini 200[/purple] 
     """
 
 
