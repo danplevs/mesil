@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "mesil"
 version = "0.1.0"
-description = "Source code used in my undergraduate research \"Investigation of cellular internalization and nanovalve endocytosis mechanisms in fluorescence-labeled rod morphology: a treatment for esophageal cancer\"."
+description = "Process and plot scientific data from various analyses (equipment specific)"
 authors = ["Daniel Levita <71600818+danplevs@users.noreply.github.com>"]
 license = "MIT"
 readme = "README.md"
